@@ -22,16 +22,41 @@ def main():
     # # 3.保存数据
     # saveData(savepath)
 
-    askURL(baseURL)
+    # askURL(baseURL)
+# 影片详情连接的规则
+findLink = re.compile(r'<a href="(.*?)">')#创建正则表达式对象，表示规则
+# 影片图片
+
+# 影片的片名
+findTitle = re.compile(r'<span class ="title">(.*?)</span>')
+# 影片的评分
+findRating = re.compile(r'<span class="rating_num" property="v:average">(.*?)</span>')
+# 评价人数
+findJudge = re.compile(r'<span>(\d*)人评价</span>')
+# 影片的主演
+findActor = re.compile(r'<p class="">（.*?） </p>',re.S)
 # 爬取网页
 def getData(baseurl):
     dataList = []
-    for i in range(0,10):
+    for i in range(0,1):
 
         url = baseurl + str(i*25)#调用获取页面信息的函数10次
         html = askURL(url)#保存获取到的网页源码
         # 2 逐一解析网页
+        soup= BeautifulSoup(html,'html.parser')
+        for item in soup.find_all('div',class_ = 'item'):
+            # print(item)#测试：查看电影的item全部信息
+            data = []#保存一部电影的所有信息
+            item = str(item)
+            link = re.findall(findLink,item)[0]#0表示只要第一个,link保存电影的链接
+            data.append(link)
+            title = re.findall(findTitle,item)
+            data.append(title)
+            dataList.append(data)
 
+            # print(type(link),link[0])
+            # print(link,len(link))
+    print(dataList)
     return dataList
 # 得到指定一个网页内容
 def askURL(url):
@@ -42,7 +67,7 @@ def askURL(url):
     try:
         response = urllib.request.urlopen(req)
         html = response.read().decode('utf-8')
-        print(html)
+        # print(html)
     except urllib.error.URLError as e:
         if hasattr(e,'code'):
             print(e.code)
