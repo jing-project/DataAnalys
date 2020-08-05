@@ -49,3 +49,4 @@ for item in soup.find_all('div', class_='item'):
     data.append(star.strip())
     print(data)
     print(star)
+    data.append(link)
