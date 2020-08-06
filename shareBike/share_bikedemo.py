@@ -104,19 +104,19 @@ train_WithoutOutliers = bike_train[np.abs(bike_train['count']-
 #
 Bike_data=pd.concat([train_WithoutOutliers,bike_test],ignore_index=True)
 #查看数据集大小
-print(Bike_data.shape)
-print(Bike_data.head())
+# print(Bike_data.shape)
+# print(Bike_data.head())
 #
 # # 2)特征工程：从datetime中提取年、月、日、时、星期等时间信息
-# # 因为最终需要使用随机森林预测，并且为了方便查可视化数据，先把datetime拆分成成日期、时段、年份、月份、星期五列
+# # 因为最终需要使用随机森林预测，并且为了方便查可视化数据，先把datetime拆分成成日期、时段、年份、月份、星期列
 Bike_data['date']=Bike_data.datetime.apply( lambda c : c.split( )[0])
 Bike_data['year']=Bike_data.date.apply(lambda x:x.split("-")[0])
 Bike_data['month']=Bike_data.date.apply(lambda x:x.split("-")[1])
 Bike_data['day']=Bike_data.date.apply(lambda x:x.split("-")[2])
 Bike_data['hour']=Bike_data.datetime.apply(lambda x: x.split()[1].split(":")[0])
 Bike_data['weekday']=Bike_data.datetime.apply(lambda x: calendar.day_name[pd.to_datetime(x).weekday()])
-print(Bike_data.head())
-# # 观察上面的数据可以看到temp（温度），atemp（体感温度），humidity（湿度）、windspeed（风速）这四列也属于数值型数据，同样可以查看一下它们的分布。
+# print(Bike_data.head())
+# # # 观察上面的数据可以看到temp（温度），atemp（体感温度），humidity（湿度）、windspeed（风速）这四列也属于数值型数据，同样可以查看一下它们的分布。
 # fig, axes = plt.subplots(2, 2)
 # fig.set_size_inches(12,10)
 #
@@ -129,34 +129,34 @@ print(Bike_data.head())
 # axes[0,1].set(xlabel='atemp',title='Distribution of atemp')
 # axes[1,0].set(xlabel='humidity',title='Distribution of humidity')
 # axes[1,1].set(xlabel='windspeed',title='Distribution of windspeed')
-# # 通过这个分布可以发现一些问题，比如风速为什么0的数据很多，
-# # 而观察统计描述发现空缺值在1--6之间，从这里似乎可以推测，数据本身或许是有缺失值的，
-# # 但是用0来填充了，但这些风速为0的数据会对预测产生干扰，
-# # 希望使用随机森林根据相同的年份，月份，季节，温度，湿度等几个特征来填充一下风速的缺失值
-# # 填充之前看一下非零数据的描述统计。
+# # # 通过这个分布可以发现一些问题，比如风速为什么0的数据很多，
+# # # 而观察统计描述发现空缺值在1--6之间，从这里似乎可以推测，数据本身或许是有缺失值的，
+# # # 但是用0来填充了，但这些风速为0的数据会对预测产生干扰，
+# # # 希望使用随机森林根据相同的年份，月份，季节，温度，湿度等几个特征来填充一下风速的缺失值
+# # # 填充之前看一下非零数据的描述统计。
 # print(Bike_data[Bike_data['windspeed']!=0]['windspeed'].describe())
 #
 # # 使用随机森林填充风速
 #
 #
-# Bike_data["windspeed_rfr"]=Bike_data["windspeed"]
-# # 将数据分成风速等于0和不等于两部分
-# dataWind0 = Bike_data[Bike_data["windspeed_rfr"]==0]
-# dataWindNot0 = Bike_data[Bike_data["windspeed_rfr"]!=0]
-# #选定模型
-# rfModel_wind = RandomForestRegressor(n_estimators=1000,random_state=42)
-# # 选定特征值
-# windColumns = ["season","weather","humidity","month","temp","year","atemp"]
-# # 将风速不等于0的数据作为训练集，fit到RandomForestRegressor之中
-# rfModel_wind.fit(dataWindNot0[windColumns], dataWindNot0["windspeed_rfr"])
-# #通过训练好的模型预测风速
-# wind0Values = rfModel_wind.predict(X= dataWind0[windColumns])
-# #将预测的风速填充到风速为零的数据中
-# dataWind0.loc[:,"windspeed_rfr"] = wind0Values
-# #连接两部分数据
-# Bike_data = dataWindNot0.append(dataWind0)
-# Bike_data.reset_index(inplace=True)
-# Bike_data.drop('index',inplace=True,axis=1)
+Bike_data["windspeed_rfr"]=Bike_data["windspeed"]
+# 将数据分成风速等于0和不等于两部分
+dataWind0 = Bike_data[Bike_data["windspeed_rfr"]==0]
+dataWindNot0 = Bike_data[Bike_data["windspeed_rfr"]!=0]
+#选定模型
+rfModel_wind = RandomForestRegressor(n_estimators=1000,random_state=42)
+# 选定特征值
+windColumns = ["season","weather","humidity","month","temp","year","atemp"]
+# 将风速不等于0的数据作为训练集，fit到RandomForestRegressor之中
+rfModel_wind.fit(dataWindNot0[windColumns], dataWindNot0["windspeed_rfr"])
+#通过训练好的模型预测风速
+wind0Values = rfModel_wind.predict(X= dataWind0[windColumns])
+#将预测的风速填充到风速为零的数据中
+dataWind0.loc[:,"windspeed_rfr"] = wind0Values
+#连接两部分数据
+Bike_data = dataWindNot0.append(dataWind0)
+Bike_data.reset_index(inplace=True)
+Bike_data.drop('index',inplace=True,axis=1)
 # # 填充好再画图观察一下这四个特征值的密度分布
 # fig, axes = plt.subplots(2, 2)
 # fig.set_size_inches(12,10)
@@ -176,9 +176,9 @@ print(Bike_data.head())
 # # 3.1 整体观察
 # #
 # # 问题是希望预测每小时总租赁额，首先整体看一下租赁额相关的三个值和其他特征值的关系
-# sns.pairplot(Bike_data ,x_vars=['holiday','workingday','weather','season',
-#                                 'weekday','hour','windspeed_rfr','humidity','temp','atemp'] ,
-#                         y_vars=['casual','registered','count'] , plot_kws={'alpha': 0.1})
+sns.pairplot(Bike_data ,x_vars=['holiday','workingday','weather','season',
+                                'weekday','hour','windspeed_rfr','humidity','temp','atemp'] ,
+                        y_vars=['casual','registered','count'] , plot_kws={'alpha': 0.1})
 # # 大致可以看出
 # # 1.会员在工作日出行多，节假日出行少，临时用户则相反；
 # # 2.一季度出行人数总体偏少；
@@ -189,9 +189,9 @@ print(Bike_data.head())
 #
 #
 # # 下面查看各个特征与每小时租车总量（count）的相关性，
-# # 由于上图可以看出特征值与租车数量基本是线性相关，所以求他们的线性相关系数
-# #相关性矩阵
-# corrDf = Bike_data.corr()
+# # # 由于上图可以看出特征值与租车数量基本是线性相关，所以求他们的线性相关系数
+# # #相关性矩阵
+# # corrDf = Bike_data.corr()
 #
 # #ascending=False表示按降序排列
 # corrDf['count'].sort_values(ascending =False)
