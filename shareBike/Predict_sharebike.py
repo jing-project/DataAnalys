@@ -236,6 +236,7 @@ print(Bike_data.head())
 #                                                                      'temp':'median'})
 # #由于测试数据集中没有租赁信息，会导致折线图有断裂，所以将缺失的数据丢弃
 # temp_df.dropna ( axis = 0 , how ='any', inplace = True )
+
 #
 # #预计按天统计的波动仍然很大，再按月取日平均值
 # temp_month = temp_df.groupby(['year','month'], as_index=False).agg({'weekday':'min',
