@@ -11,13 +11,11 @@
 
 import numpy as np
 import pandas as pd
-
-
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 import calendar
-from sklearn.ensemble import RandomForestRegressor
+
 
 
 plt.rcParams['font.sans-serif'] = ['SimHei']  # 设置中文字体
@@ -55,7 +53,7 @@ print(bike_train.head())
 #
 # 1)数据预处理：数据完整无缺失值
 # 2)特征工程：从datetime中提取年、月、日、时、星期等时间信息
-import calendar
+
 
 bike_train['date']=bike_train.datetime.apply(lambda x :x.split()[0])
 bike_train['year']=bike_train.date.apply(lambda x:x.split("-")[0])
@@ -71,8 +69,6 @@ bike_train['season']=bike_train.season.map({1: "Spring", 2 : "Summer", 3 : "Fall
 # 1）单车使用量在天气维度上的分析（天气、温度、湿度和风速相关性）
 
 
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 print(bike_train)
 
@@ -117,12 +113,12 @@ sns.regplot(x="humidity", y="count", data=bike_train,ax=ax3)
 # 2）单车使用量在时间维度上的分析（月份、季节、时间、星期等相关性）
 
 #租车总量和工作日、节假日的关系
-(ax1,ax2) = plt.subplots(1,2, figsize=(10,5))
-sns.boxplot(data=bike_train, y='count', x='workingday',ax=ax1)
-sns.boxplot(data=bike_train, y='count', x='holiday',ax=ax2)
+(ax) = plt.subplots(1,2, figsize=(10,5))
+sns.boxplot(data=bike_train, y='count', x='workingday',ax=ax[0])
+sns.boxplot(data=bike_train, y='count', x='holiday',ax=ax[1])
 
-ax1.set(xticklabels=['Not holiday','Holiday'])
-ax2.set(xticklabels=['Weekend','Workday'])
+ax[0].set(xticklabels=['Not holiday','Holiday'])
+ax[1].set(xticklabels=['Weekend','Workday'])
 # 总量来看，节假日和周末/工作日的租车数量基本相同。
 
 axes = plt.subplots(3,1, figsize=(12,20))
